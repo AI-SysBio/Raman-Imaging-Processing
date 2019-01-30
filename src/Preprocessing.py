@@ -28,7 +28,7 @@ def preprocess(fpath, fname):
     baseline_correction = "als"
     denoising = "svd"
     svd_components=10
-    cut_side = True #side of Raman image sometimes has problem
+    cut_side = False #side of Raman image sometimes has problem
     
     # ------------------------------------------------------------------------------- # 
     

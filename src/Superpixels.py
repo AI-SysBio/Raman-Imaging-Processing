@@ -63,7 +63,7 @@ def save_image(data, fn):
     
     
 
-def superpixel(dirname,use_manual_mask,superpixel_size):
+def superpixel(dirname,use_manual_mask,superpixel_size,dates):
 
     
     f = 600 #number of wavenumbers in interpolated plot
@@ -72,63 +72,6 @@ def superpixel(dirname,use_manual_mask,superpixel_size):
     w_new = np.linspace(wmin, wmax, num=f)
     dirname = "./Processed_Measurements/"
     
-    
-    dates = []
-    
-    #Jan2018
-    dates.append([
-            "ftc01",
-            "ftc02",
-            "ftc03",
-            "nthy01",
-            "nthy02",
-            "nthy03",
-            ])
-    
-    #March2018
-    dates.append([
-            "ftc04",
-            "ftc05",
-            "ftc06",
-            "ftc07",
-            "ftc08",
-            "nthy04",
-            "nthy05",
-            "nthy06",
-            "nthy07",
-            ])
-    
-    #June2018
-    dates.append([
-            "ftc09",
-            "ftc10",
-            "ftc11",
-            "ftc12",
-            "nthy09",
-            "nthy10",
-            "nthy11",
-            "nthy12",
-            ])
-    
-    #July2018
-    dates.append([
-            "ftc13",
-            "ftc14",
-            "nthy13",
-            "nthy14",
-            ])
-    
-    #Jan2019
-    dates.append([
-            "ftc15",
-            "ftc16",
-            "ftc17",
-            "ftc18",
-            "nthy15",
-            "nthy16",
-            "nthy17",
-            "nthy18",
-            ])
     
     nfile = 0
     cell_index_list = []
@@ -208,21 +151,18 @@ def superpixel(dirname,use_manual_mask,superpixel_size):
             
             #load_mask
             if use_manual_mask:
-                maskfile = ("Mask_cells_manual/%s_mask.npy" % fdisp)
+                maskfile = ("Processed_Measurements/Maks_cells_manual/%s_mask.npy" % fdisp)
                 if os.path.isfile(maskfile):
                     mask_kcells = np.load(maskfile)
-                    # mask_kcells = np.flip(mask_kcells, axis=0)
+                    #mask_kcells = np.flip(mask_kcells, axis=0)
                 else:
                     print("Manually segmented mask is not found for image %s" % fdisp)
                     sys.exit(0)
             
             else:
-                maskfile = ("Mask_cells/%s_mask.npy" % fdisp)
-                if os.path.isfile(maskfile):
-                    mask_kcells = np.load(maskfile)
-                    print("Using mask for %s" % fdisp)
-                else:
-                    mask_kcells = segment_cells(dirname, filename)
+                maskfile = ("Processed_Measurements/Mask_cells/%s_mask.npy" % fdisp)
+                mask_kcells = segment_cells(dirname, filename)
+                np.save(maskfile,mask_kcells)
            
             
             n_clust = int(np.max(mask_kcells))
@@ -299,7 +239,9 @@ def superpixel(dirname,use_manual_mask,superpixel_size):
             plt.savefig("Processed_Measurements/segmentation_superpixel/%s_zfinal.png" %  (fdisp))
             plt.show()
                 
-                
+            ncells = n_clust
+            print("    ", ncells,"cells in this image")
+            
             
                 
                 
@@ -434,34 +376,14 @@ def segment_cells(dirname, filename, superpixel_size = 100):
            
             Shape = np.shape(Measurements)
             nx = Shape[0]
-            ny = Shape[1]
-            nw = Shape[2]        
+            ny = Shape[1]       
             
 
-                
-            Xmeanfull = np.mean(Measurements, axis=2)
-            vmax = max(Xmeanfull[data["ignore"]==False])*0.9
-            vmin = min(Xmeanfull[data["ignore"]==False]) 
-            plt.imshow(Xmeanfull, vmax=vmax, vmin=vmin, origin='lower')
-            plt.savefig("Processed_Measurements/segmentation_superpixel/%s_0av_or.png" %  (fdisp))
-            plt.show()
-            
-            
             wb1 = np.argmin(abs(wn-2950))
             wb2 = np.argmin(abs(wn-2990))
             wavenumber_index_0 = np.arange(wb1,wb2)
-            
             Xmean = np.mean(normMeas[:,:,wavenumber_index_0], axis=2)
-            
-            vmax = max(Xmean[data["ignore"]==False])*0.9
-            vmin = min(Xmean[data["ignore"]==False])            
-            plt.imshow(Xmean, vmax=vmax, vmin=vmin, origin='lower')
-            ys, xs = np.where(data["ignore"])
-            plt.scatter(xs, ys, s=0.7, c="r", label="cosmicray")
-            plt.savefig("Processed_Measurements/segmentation_superpixel/%s_av_hv.png" %  (fdisp))
-            plt.savefig("Spectra_Analysis/Classified_cells/%s_av_hv.png" %  (fdisp))
-            plt.show()    
-
+            vmax = max(Xmean[data["ignore"]==False])           
 
             #Superpixel Segmentation
             print("\n  Superpixel segmentation...")

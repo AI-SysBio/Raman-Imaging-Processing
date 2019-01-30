@@ -40,16 +40,36 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+
+
+def set_dates():
+    
+    
+    labels = ["Date1", "Date2"] 
+    
+    dates = []
+    #Date1
+    dates.append(["ftc01","nthy01"])
+    #Date2
+    dates.append(["ftc02","nthy02"])
+
+    return dates,labels
+
+
+
+
+
+
 def main():
     
     erase_preprocessed = False
     erase_superpixel = False
     erase_postprocessed = False
     erase_cell_population = False
-    use_manual_mask = True
+    use_manual_mask = False
     
-    labels = ["Jan18", "March18", "June18", "July18", "Jan19", "6", "7", "8", "9", "10"] 
     
+    dates,labels = set_dates()
     
     
 
@@ -103,7 +123,7 @@ def main():
     pixel_size = 10
     superpixel_file = "Spectra_Analysis/Superpixel_spectras_%s.npz" % pixel_size
     if not os.path.isfile(superpixel_file) or erase_superpixel:
-        spectra_data = superpixel(dirname,use_manual_mask,pixel_size)
+        spectra_data = superpixel(dirname,use_manual_mask,pixel_size,dates)
         np.savez(superpixel_file, **spectra_data)
     else:
         print("\n   Using %s ..." % superpixel_file[17:])

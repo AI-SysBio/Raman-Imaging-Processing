@@ -42,7 +42,7 @@ def perform_PCA(X,yc,yi,plot):
     
     colors_i = []
     for i in range(len(yi)):
-        colors_i.append(colors[int(yi[i])])
+        colors_i.append(colors[int(yi[i])+2])
             
         
            

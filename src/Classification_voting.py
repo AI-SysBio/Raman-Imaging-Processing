@@ -65,8 +65,8 @@ def classify_voting(data,labels, plot = False):
         colors_p4.append(color[c4[i]])
         colors_c.append(color2[c[i]])
         colors_d.append(color2[d[i]+2])
-        if labels[c[i]] not in date_c:
-            date_c.append(labels[c[i]])
+        if labels[d[i]] not in date_c:
+            date_c.append(labels[d[i]])
         
     print("\n\n  Classification results:")
     print("    line 1 = date [", end='')
