@@ -18,9 +18,9 @@ This repository contains the preprocessing and postprocessing tools to analyse h
         process all the superpixel spectra with background subtraction and other methods
         (see Postprocessing.py for details)
     
-    4) & 5) Classification with subcellular voting and spectral clustering        
+    4) & 5) Classification with average cell spectra and subcellular spectral clustering        
             (each date is taken as a test set and is predicted with a classifier trained on other dates)
             (=> requires at least 2 different dates to work)
             (=> requires at least 1FTC image and 1NT image to work)
     
-        (see Classification_voting.py and Classification_clusters,py for details)
+        (see Classification_cell_level.py and Classification_clusters,py for details)
