@@ -92,6 +92,6 @@ def preprocess(fpath, fname):
         
         
 
-    return { "rawdata" : X_init, "corrected_data" : X, "data": X2, "normdata": nX, "wavenumber": wn, "ignore": ignore}
+    return { "rawdata" : X_init, "data": X2, "normdata": nX, "wavenumber": wn, "ignore": ignore}
     
 

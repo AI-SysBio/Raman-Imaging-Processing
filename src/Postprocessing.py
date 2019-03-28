@@ -21,7 +21,7 @@ Each file contains
            filename: 1d array n, original filename of each image
 """
 
-def process_spectras(filename):
+def process_spectras(filename, base_correc):
 
     
     # ------------------------------------------------------------------------------- #
@@ -38,15 +38,32 @@ def process_spectras(filename):
     
     remove_background = True  #subtract the mean spectra from noncell regions
     
-    baseline_correction = "offset" #"polyfit","als","offset"
+    baseline_correction = "polyfit" #"polyfit","als","offset"
     
     normalize = True     
     normalization = "area" #"area","snv","msc"    
-    without_chang_wv = True  #True if you want to normalize only on the low wavenumber region (that is not important for FTC diagnosis)
+    without_chang_wv = False #True if you want to normalize only on the low wavenumber region (that is not important for FTC diagnosis)
 
     
-    translate_Nthy = False   #if you want to perform covariate shift with nthy image as a reference
+    translate_Nthy = False  #if you want to perform covariate shift with nthy image as a reference
                              #(if there is no Nthy for a given date, shifting is not performed for that date)
+                             
+                             
+    if base_correc == "offset":
+        remove_background = True
+        baseline_correction = "offset"
+        
+    elif base_correc == "poly":
+        remove_background = True
+        baseline_correction = "polyfit"
+        
+    elif base_correc == "als":
+        remove_background = True
+        baseline_correction = "als"
+        
+    elif base_correc == "poly_only":
+        remove_background = False
+        baseline_correction = "polyfit"
     
    # --------------------------------------------------------------------------------------------------------- #   
     
@@ -62,11 +79,22 @@ def process_spectras(filename):
 
     yi = data["date_label"]
     yc = data["cancer_label"]
-    ycell = data["cell_label"]
-    yn = data["nucleus_label"]    
+    yl = data["line_label"]
+    ycell = data["cell_label"]  
     yim = data["image_label"] 
     yfile = data["filename"] 
     ypos = data["spectra_position"]
+    
+    Remove_Date = False; Date = 4
+    if Remove_Date:
+        nkeep = np.where(yi != Date)
+        X = X[nkeep]
+        yc = yc[nkeep]
+        yi = yi[nkeep]
+        yim = yim[nkeep]
+        ycell = ycell[nkeep]   
+        yfile = yfile[nkeep]
+        ypos = ypos[nkeep]
         
         
     N = X.shape[0]
@@ -124,11 +152,8 @@ def process_spectras(filename):
         
         if normalization in {"area"}:
             if without_chang_wv:
-                wh = np.argmin(abs(wn-2850))
-                w1 = np.argmin(abs(wn-1200))
-                w2 = np.argmin(abs(wn-1800))
+                wh = np.argmin(abs(wn-2800))
                 X3[:,wh:] = 0
-                X3[:,w1:w2] = 0
             for i in range(X2.shape[0]): 
                 sumW = np.sum(np.abs(X3[i,:]))
                 if sumW != 0:
@@ -163,19 +188,57 @@ def process_spectras(filename):
             if np.size(nimg) != 0:
                 for wi in range(f):
                     wimg = np.mean(X2[nimg,wi])
-                    X_trans[nimg,wi] = X2[nimg,wi] - wimg
+                    X_trans[nimg,wi] = X2[nimg,wi] - wimg 
+
+    X = np.copy(X_trans)    
+    
+    nw = X.shape[1]
+    nimg = np.max(yim)+1
+    ndate = np.max(yi)+1
+    X_av = np.empty(shape=[0, nw])
+    y_c = np.array([])
+    y_i = np.array([])
+    y_im = np.array([])
+    y_l = np.array([]) 
+    y_file = []
+    
+    
+    for date_index in range(0,ndate):
+        n_date = np.where(yi == date_index)
+        if np.size(n_date) > 0:
+            for img_index in range(0,nimg):
+                n_img = np.where(yim[n_date] == img_index)
+                if np.size(n_img) > 0:
+                    ncells = int(np.max(ycell[n_date][n_img]))+1
+                    for cell_index in range(0,ncells):
+                        n_sample = np.where(np.logical_and(np.logical_and(ycell == cell_index, yim == img_index),yi == date_index))
+                        if np.size(n_sample) > 0:
+                            
+                            X_cell = X[n_sample[0],:]
+                            X_av = np.append(X_av, np.mean(X_cell,axis=0).reshape(1,-1), axis=0)
+                            y_c = np.append(y_c,yc[n_sample][0])
+                            y_i = np.append(y_i,yi[n_sample][0])
+                            y_im = np.append(y_im,yim[n_sample][0]) 
+                            y_l = np.append(y_l,yl[n_sample][0])  
+                            y_file.append(yfile[n_sample][0])
                     
                     
-    data = {"wavenumber":wn, "data": X_trans, "notnormdata": X_notnorm, "cancer_label": yc, "date_label": yi, "image_label": yim, "cell_label":ycell, "spectra_position":ypos, "filename":yfile }
-    return data
+    data = {"wavenumber":wn, "data": X_trans, "notnormdata": X_notnorm, "cancer_label": yc, "date_label": yi, "line_label": yl, "image_label": yim, "cell_label":ycell, "spectra_position":ypos, "filename":yfile }  
+    data_av = {"wavenumber":wn, "data": X_av, "cancer_label": y_c, "date_label": y_i, "line_label": y_l, "image_label": y_im, "filename":y_file }
+    
+    return data, data_av
+
                    
 
 
  
                     
-def plot_spectra(data):
+def plot_spectra(data,norm = True):
     
-    X = data["data"]
+    if norm:
+        X = data["data"]
+    else:
+        X = data["notnormdata"]
     yc = data["cancer_label"]
     wn = data["wavenumber"]
     
@@ -209,10 +272,83 @@ def plot_spectra(data):
     bax.tick_params(axis='both', labelleft = False, labelbottom = False, bottom = False)
     
     bax = brokenaxes(xlims=((min(wn1),max(wn1)), (min(wn2)-20,max(wn2))), hspace=0.15, subplot_spec=sps2)
+    bax.axhline(y=0, color='black', linestyle='--',alpha=0.3)
     bax.plot(x, Mean1-Mean2, color = "black", linewidth = 2)
     bax.fill_between(wn, lower_CI-np.mean(X,axis=0), upper_CI-np.mean(X,axis=0), color = '#539caf', alpha = 0.4)
     bax.set_ylabel('$\\Delta$ Intensity [au]') 
+    bax.set_ylim(-1.5,1.5)
     bax.tick_params(axis='y', labelleft = False)
     
     plt.show()
+    
+    
+    
+    
+    
+    
+def plot_pca(data, alpha = 0.1):
+    
+    plt.rcParams.update({'font.size': 14})
+    
+    print("\n  plotting PCA ...")
+    
+    X = data["data"]
+    yc = data["cancer_label"]
+    yi = data["date_label"]
+    yl = data["line_label"]    
+       
+
+    
+    Nkeep = 10000
+    if X.shape[0] > Nkeep:
+        nkeep = np.random.randint(X.shape[0],size=Nkeep)
+        X = X[nkeep,:]
+        yc = yc[nkeep]
+        yi = yi[nkeep]
+        yl = yl[nkeep]
+    
+    pca = PCA(n_components = 5)
+    X_reduced = pca.fit_transform(X)
+    
+    
+    colors = ["blue", "red", "green", "gold", "darkviolet", "cadetblue", "navy", "olive", "darkcyan", "darkorange", "brown", "coral", "chartreuse", "orange", "crimson", "chocolate", "maroon","dodgerblue","goldenrod", "darkred","darkblue","blue", "red", "gold", "darkviolet", "cadetblue", "navy", "olive", "darkcyan", "darkorange", "brown", "coral", "chartreuse", "orange", "crimson", "chocolate", "maroon","dodgerblue","goldenrod", "darkred","darkblue","blue", "red", "gold", "darkviolet", "cadetblue", "navy", "olive", "darkcyan", "darkorange", "brown", "coral", "chartreuse", "orange", "crimson", "chocolate", "maroon","dodgerblue","goldenrod", "darkred","darkblue"]
+    
+    colors_c = []
+    for i in range(len(yc)):
+        colors_c.append(colors[int(yc[i])])
+    
+    colors_i = []
+    for i in range(len(yi)):
+        colors_i.append(colors[int(yi[i])+3])
+        
+    colors_l = []
+    for i in range(len(yl)):
+        colors_l.append(colors[int(yl[i])])
+        
+                       
+    
+    plt.scatter(X_reduced[:,0], X_reduced[:,1], color = colors_i, alpha=alpha)   
+    plt.title("PCA of Raman wavenumbers by date")
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    plt.axis("off")
+    plt.show()
+       
+    plt.scatter(X_reduced[:,0], X_reduced[:,1], color = colors_c, alpha=alpha)   
+    plt.title("PCA of Raman wavenumbers by malignancy")
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    plt.axis("off")
+    plt.show()
+
+    """    
+    plt.scatter(X_reduced[:,0], X_reduced[:,1], color = colors_l, alpha=0.1)   
+    plt.title("PCA of Raman wavenumbers by cell line")
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    plt.axis("off")
+    plt.show()
+    """
+    
+    print("   first 2 PCA explained variance is %.2f" % (pca.explained_variance_ratio_[0] + pca.explained_variance_ratio_[1]))
         

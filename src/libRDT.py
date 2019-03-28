@@ -9,7 +9,7 @@ from scipy.spatial.distance import pdist,squareform
 
 
 
-def RDT_Clustering(X,n_clusters,distance,Nrand = 10000,plot=False):
+def RDT_Clustering(X,n_clusters,distance,nkeep,Nrand = 10000,plot=False):
 
     """
     Perform Clustering using Rate distortion theory [1].
@@ -40,8 +40,7 @@ def RDT_Clustering(X,n_clusters,distance,Nrand = 10000,plot=False):
     [1] Tavakoli M, Taylor JN, Li CB, Komatsuzaki T, Pressé S. 
         Single molecule data analysis: an introduction.
         arXiv preprint arXiv:1606.00403. 2016 Jun 1.    
-    """
-    
+    """    
     random.seed(a=None)
     
     # Input parameters
@@ -57,14 +56,17 @@ def RDT_Clustering(X,n_clusters,distance,Nrand = 10000,plot=False):
     """
     
     
+    #remove outlier spectra for our clustering
+    X2 = X[nkeep]
+    
     #random sampling of the spectra set to avoid memory error
-    if X.shape[0] > Nrand:
-        nkeep = np.random.randint(X.shape[0],size=Nrand)
-        Xkeep = X[nkeep,:]
+    if X2.shape[0] > Nrand:
+        nkeep = np.random.randint(X2.shape[0],size=Nrand)
+        Xkeep = X2[nkeep,:]
     
     else:
-        Xkeep = X
-        Nrand = X.shape[0]
+        Xkeep = X2
+        Nrand = X2.shape[0]
 
     print("    Computing pairwise distances for %s spectra..." % Nrand)
     dij = squareform(pdist(Xkeep, distance))

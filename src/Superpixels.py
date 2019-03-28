@@ -77,7 +77,7 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
     cell_index_list = []
     cancer_index_list = []
     date_index_list = []
-    nucleus_index_list = []
+    line_index_list = []
     img_index_list = []
     original_filename_list = []
     ypos_list = []
@@ -115,12 +115,18 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
             
             if not os.path.exists("Processed_Measurements/segmentation_superpixel"):
                 os.makedirs("Processed_Measurements/segmentation_superpixel")
+                
+            if not os.path.exists("Processed_Measurements/Mask_cells_auto"):
+                os.makedirs("Processed_Measurements/Mask_cells_auto") 
+                
+            if not os.path.exists("Processed_Measurements/Mask_cells_manual"):
+                os.makedirs("Processed_Measurements/Mask_cells_manual") 
 
             if not os.path.exists("Spectra_Analysis"):
                 os.makedirs("Spectra_Analysis")  
                 
             if not os.path.exists("Spectra_Analysis/Classified_cells"):
-                os.makedirs("Spectra_Analysis/Classified_cells")  
+                os.makedirs("Spectra_Analysis/Classified_cells") 
                 
             Xmeanfull = np.mean(Measurements, axis=2)
             vmax = max(Xmeanfull[data["ignore"]==False])*0.9
@@ -130,8 +136,8 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
             plt.show()
             
             
-            wb1 = np.argmin(abs(wn-2950))
-            wb2 = np.argmin(abs(wn-2990))
+            wb1 = np.argmin(abs(wn-2800))
+            wb2 = np.argmin(abs(wn-3000))
             wavenumber_index_0 = np.arange(wb1,wb2)
             
             Xmean = np.mean(normMeas[:,:,wavenumber_index_0], axis=2)
@@ -151,7 +157,7 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
             
             #load_mask
             if use_manual_mask:
-                maskfile = ("Processed_Measurements/Maks_cells_manual/%s_mask.npy" % fdisp)
+                maskfile = ("Processed_Measurements/Mask_cells_manual/%s_mask.npy" % fdisp)
                 if os.path.isfile(maskfile):
                     mask_kcells = np.load(maskfile)
                     #mask_kcells = np.flip(mask_kcells, axis=0)
@@ -160,7 +166,7 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
                     sys.exit(0)
             
             else:
-                maskfile = ("Processed_Measurements/Mask_cells/%s_mask.npy" % fdisp)
+                maskfile = ("Processed_Measurements/Mask_cells_auto/%s_mask.npy" % fdisp)
                 mask_kcells = segment_cells(dirname, filename)
                 np.save(maskfile,mask_kcells)
            
@@ -266,9 +272,9 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
                 
             else:
                 plt.rcParams.update({'font.size': 14})
-                mean_back = np.median(Measurements[xb,yb,:],axis=(0))
-                mean_backr = np.median(rawMeas[xb,yb,:],axis=(0))
-                mean_cell = np.median(rawMeas[xc,yc,:],axis=(0))
+                mean_back = np.mean(Measurements[xb,yb,:],axis=(0))
+                mean_backr = np.mean(rawMeas[xb,yb,:],axis=(0))
+                mean_cell = np.mean(rawMeas[xc,yc,:],axis=(0))
                 funb = interp1d(wn, mean_back, kind='cubic')
                 funbr = interp1d(wn, mean_backr, kind='cubic')
                 funcr = interp1d(wn, mean_cell, kind='cubic')
@@ -308,8 +314,6 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
                             X_out_list.append(fun(w_new))
                             X_outr_list.append(funr(w_new))
                             
-                            nucleus_index_list.append(mask_cells[xav,yav]-1)
-                            
                             cell_index_list.append(mask_kcells[xav,yav])
                             
                             img_index_list.append(nfile)
@@ -320,10 +324,13 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
                             
                             if "ftc" in filename or "FTC" in filename:
                                 cancer_index_list.append(1)
+                                line_index_list.append(1)
                             elif "Nthy" in filename or "nthy" in filename:
                                 cancer_index_list.append(0)
+                                line_index_list.append(0)
                             else:
                                 cancer_index_list.append(-1)
+                                line_index_list.append(-1)
                                 
                             files_found = False
                             for iname in range(len(dates)):
@@ -343,14 +350,14 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
     cell_index = np.array(cell_index_list)  
     cancer_index = np.array(cancer_index_list)
     date_index = np.array(date_index_list)
-    nucleus_index = np.array(nucleus_index_list)
+    line_index = np.array(line_index_list)
     img_index = np.array(img_index_list)
     y_pos = np.array(ypos_list)
     
     
     print("    ", np.size(cell_index), "spectra saved")
         
-    data = {"rawdata": X_raw, "data": X_specs, "background": X_back, "rawbackground": X_backr,"wavenumber": w_new, "cell_label": cell_index, "cancer_label": cancer_index, "image_label": img_index, "date_label": date_index, "nucleus_label": nucleus_index, "filename": original_filename_list, "spectra_position": y_pos }
+    data = {"rawdata": X_raw, "data": X_specs, "background": X_back, "rawbackground": X_backr,"wavenumber": w_new, "cell_label": cell_index, "cancer_label": cancer_index, "image_label": img_index, "date_label": date_index, "line_label": line_index, "filename": original_filename_list, "spectra_position": y_pos }
     return data
 
         
@@ -363,7 +370,7 @@ def offset_correction(X):
 
 
 
-def segment_cells(dirname, filename, superpixel_size = 100):
+def segment_cells(dirname, filename, superpixel_size = 10):
     
             fpath = "%s/%s" % (dirname, filename) 
             fdisp = filename[3:-4]
@@ -379,8 +386,8 @@ def segment_cells(dirname, filename, superpixel_size = 100):
             ny = Shape[1]       
             
 
-            wb1 = np.argmin(abs(wn-2950))
-            wb2 = np.argmin(abs(wn-2990))
+            wb1 = np.argmin(abs(wn-2800))
+            wb2 = np.argmin(abs(wn-3000))
             wavenumber_index_0 = np.arange(wb1,wb2)
             Xmean = np.mean(normMeas[:,:,wavenumber_index_0], axis=2)
             vmax = max(Xmean[data["ignore"]==False])           
@@ -438,13 +445,13 @@ def segment_cells(dirname, filename, superpixel_size = 100):
             
             #Clustering superpixel images
             print("\n  Clustering Nucleus/Cell/background")
-            n_cluster = 8
+            n_cluster = 16
             kmeans = KMeans(n_clusters=n_cluster).fit(X_out.reshape(-1,1))
             kmeans_labels = np.reshape(kmeans.labels_, (-1, ny))
             
             max_cluster = np.max(kmeans.cluster_centers_)
-            threshold_cell = sorted(kmeans.cluster_centers_)[int(n_cluster*0.6)]
-            threshold_background = sorted(kmeans.cluster_centers_)[int(n_cluster*0.6)-2]
+            threshold_cell = sorted(kmeans.cluster_centers_)[int(n_cluster*0.5)]
+            threshold_background = sorted(kmeans.cluster_centers_)[int(n_cluster*0.5)-2]
             
             mask_cell = np.zeros((nx,ny))
             mask_background = np.zeros((nx,ny))
@@ -464,7 +471,19 @@ def segment_cells(dirname, filename, superpixel_size = 100):
             plt.imshow(clusters_sp, origin='lower')
             plt.savefig("Processed_Measurements/segmentation_superpixel/%s_clust.png" %  (fdisp))
             plt.show()
-            save_image(clusters_sp, "Processed_Measurements/segmentation_superpixel/%s_seg3.png" %  (fdisp))
+            
+            clusters_sp2 = np.copy(clusters_sp)
+            for xi in range(nx):
+                for yi in range(ny):
+                    if kmeans.cluster_centers_[kmeans_labels[xi,yi]] < threshold_cell:
+                        clusters_sp2[xi,yi] = 0
+                        
+            if not os.path.exists("Cells_imgs"):
+                os.makedirs("Cells_imgs")
+            save_image(clusters_sp2, "Cells_imgs/%s.png" %  (fdisp))
+            
+            plt.imshow(clusters_sp2, origin='lower')
+            plt.show()
             
             plt.imshow(mask_cell, origin='lower')
             plt.savefig("Processed_Measurements/segmentation_superpixel/%s_nuc.png" %  (fdisp))
@@ -592,10 +611,6 @@ def segment_cells(dirname, filename, superpixel_size = 100):
                 xs, ys = np.where(segments==pix_index[i])
                 mask_kcells[xs,ys] = clusters[i]
             
-            if not os.path.exists("Processed_Measurements/Mask_cells"):
-                os.makedirs("Processed_Measurements/Mask_cells")
-            scipy.io.savemat('Processed_Measurements/Mask_cells/%s.mat' % fdisp ,{'mask_cells':mask_kcells}) 
-            
             return mask_kcells
 
 
@@ -631,9 +646,3 @@ def fancy_dendrogram(*args, **kwargs):
     return ddata
         
 
-
-
-
-    
-if __name__ == "__main__":
-    main()
