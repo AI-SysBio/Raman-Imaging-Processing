@@ -22,7 +22,28 @@ from libRDT import RDT_Clustering
 
 
 
+"""
 
+   This code takes the postprocessed pixel spectra as input:
+   
+               data: n pixel spectra each with f wavenumbers (n*f 2d array), after area normalized
+        notnormdata: n pixel spectra each with f wavenumbers (n*f 2d array), before area normalized
+         wavenumber: 1d array f, corresponding to the wavenumbers values
+         cell_label: 1d array n, cell label within image (different for each cell in one image)
+        image_label: 1d array n, file label (different for each image)
+       cancer_label: 1d array n, 0 if from NT images and 1 if from FTC images
+         line_label: 1d array n, integer corresponding from the cell line
+         date_label: 1d array n, integer from 0 to ndates
+           filename: 1d array n, original filename of each image
+   spectra_position: n spectra each with ppixel position on the images (n*2 2d array)
+   
+   
+   Perform subcellular analysis with:
+       - Cluster each pixel spectra in different spectral clusters using RDT algorithm
+       - Each cell is associated to its population of each spectral class
+       - The population is used for FTC/NT classification
+              
+"""
     
     
 def RDT_subclust(filename,n_clusters):

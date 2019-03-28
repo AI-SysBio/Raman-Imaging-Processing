@@ -19,6 +19,22 @@ from pandas import DataFrame
 from libPostprocessing import *
 
 
+"""
+
+   This code takes the postprocessed average cell spectra and perform classification with various classifier 
+   by excluding the measurements taken at the same date to check for the consistancy of the measurements:
+
+               data: n cell spectra each with f wavenumbers (n*f 2d array), after area normalized
+         wavenumber: 1d array f, corresponding to the wavenumbers values
+        image_label: 1d array n, file label (different for each image)
+         date_label: 1d array n, integer from 0 to ndates
+       cancer_label: 1d array n, 0 if from NT images and 1 if from FTC images
+         line_label: 1d array n, integer corresponding from the cell line
+           filename: 1d array n, original filename of each image
+           
+"""
+
+
 
 
 

@@ -26,7 +26,7 @@ The files named "pp_....npz" are preprocessed data.
 FTC-133 is the raman data of follicular thyroid carcinoma.
 Nthy-ori 3-1 is the raman data of normal human primary thyroid follicular epithelial cells. 
 
-Each file contains 
+Each input file contains 
      rawdata: Raw data ndarray of shape of (Width, Height, Wavenumbers)
         data: processed data ndarray of shape of (Width, Height, Wavenumbers)
     normdata: normalized processed data*1e3, ndarray of shape of (Width, Height, Wavenumbers)
@@ -39,9 +39,27 @@ Each file contains
               
 This code take the preprocessed hyperspectral images and do as follow:
     1) Segment the image in superpixel spectra
-    2) Cluster background,cell,nucleus
+    2) Separate cell region from non cell regions
     3) Segment the cell spectra in different cells (with hierarchical clustering or manually segmented cells)
-    4) Save the superpixel spectra (average spectrum over each superpixel)
+    4) Save the superpixel spectra from cells (average spectrum over each superpixel)
+    
+    
+    
+    
+This function takes all the preprocessed Raman images as input and return a file that combine all the images together:
+Return one files, with the dictionaries corresponding to:
+    
+            rawdata: n spectra each with f wavenumbers (n*f 2d array), raw from the original image
+               data: n spectra each with f wavenumbers (n*f 2d array), area normalized
+         rawbackground: nimgs spectra with f wavenumbers (nimgs*f 2d array), average raw background spectra from non cell region in each images
+         wavenumber: 1d array f, corresponding to the wavenumbers values
+         cell_label: 1d array n, cell label within image (different for each cell in one image)
+        image_label: 1d array n, integer from 0 to nimgs, that is different for each image
+       cancer_label: 1d array n, 0 if from NT images and 1 if from FTC images
+         line_label: 1d array n, integer corresponding from the cell line
+         date_label: 1d array n, integer from 0 to ndates
+           filename: 1d array n, original filename of each image
+   spectra_position: n spectra each with ppixel position on the images (n*2 2d array)
 
 """
 
@@ -357,7 +375,7 @@ def superpixel(dirname,use_manual_mask,superpixel_size,dates):
     
     print("    ", np.size(cell_index), "spectra saved")
         
-    data = {"rawdata": X_raw, "data": X_specs, "background": X_back, "rawbackground": X_backr,"wavenumber": w_new, "cell_label": cell_index, "cancer_label": cancer_index, "image_label": img_index, "date_label": date_index, "line_label": line_index, "filename": original_filename_list, "spectra_position": y_pos }
+    data = {"rawdata": X_raw, "data": X_specs, "rawbackground": X_backr,"wavenumber": w_new, "cell_label": cell_index, "cancer_label": cancer_index, "image_label": img_index, "date_label": date_index, "line_label": line_index, "filename": original_filename_list, "spectra_position": y_pos }
     return data
 
         

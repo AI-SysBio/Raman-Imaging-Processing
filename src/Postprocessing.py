@@ -8,17 +8,50 @@ from libPostprocessing import *
 
 
 """
-Perform PCA and spectras postprocessing, 
 
-Each file contains 
-               data: n examples each with f wavenumbers (n*f 2d array), not normalized
+ Each input file contains 
+            rawdata: n spectra each with f wavenumbers (n*f 2d array), raw from the original image
+               data: n spectra each with f wavenumbers (n*f 2d array), area normalized
+         rawbackground: nimgs spectra with f wavenumbers (nimgs*f 2d array), average raw background from non cell region in each images
+         wavenumber: 1d array f, corresponding to the wavenumbers values
+         cell_label: 1d array n, cell label within image (different for each cell in one image)
+        image_label: 1d array n, integer from 0 to nimgs, that is different for each image
+       cancer_label: 1d array n, 0 if from NT images and 1 if from FTC images
+         line_label: 1d array n, integer corresponding from the cell line
+         date_label: 1d array n, integer from 0 to ndates
+           filename: 1d array n, original filename of each image
+   spectra_position: n spectra each with ppixel position on the images (n*2 2d array
+           
+           
+           
+           
+ This function takes the superpixel spectra and apply various postprocessing steps to obtain consistent Raman spectra:           
+ --> Return 2 files, one containing individual spectra, one containing average cell spectra, with the dictionaries corresponding to:
+    
+     
+ Output:               
+  file data:
+               data: n pixel spectra each with f wavenumbers (n*f 2d array), after area normalized
+        notnormdata: n pixel spectra each with f wavenumbers (n*f 2d array), before area normalized
          wavenumber: 1d array f, corresponding to the wavenumbers values
          cell_label: 1d array n, cell label within image (different for each cell in one image)
         image_label: 1d array n, file label (different for each image)
-       cancer_label: 1d array n, 0 for nthy and 1 for cancer
-         date_label: 1d array n, 0 for Jan, 1 for March, 2 for June, 3 for July
-      nucleus_label: 1d array n, 1 if it's from nucleus, 1 if on periphery
+       cancer_label: 1d array n, 0 if from NT images and 1 if from FTC images
+         line_label: 1d array n, integer corresponding from the cell line
+         date_label: 1d array n, integer from 0 to ndates
            filename: 1d array n, original filename of each image
+   spectra_position: n spectra each with ppixel position on the images (n*2 2d array)
+   
+   
+  file data_av:           
+               data: n cell spectra each with f wavenumbers (n*f 2d array), after area normalized
+         wavenumber: 1d array f, corresponding to the wavenumbers values
+        image_label: 1d array n, file label (different for each image)
+         date_label: 1d array n, integer from 0 to ndates
+       cancer_label: 1d array n, 0 if from NT images and 1 if from FTC images
+         line_label: 1d array n, integer corresponding from the cell line
+           filename: 1d array n, original filename of each image
+           
 """
 
 def process_spectras(filename, base_correc):
@@ -191,6 +224,9 @@ def process_spectras(filename, base_correc):
                     X_trans[nimg,wi] = X2[nimg,wi] - wimg 
 
     X = np.copy(X_trans)    
+    
+    
+    #computing average cell spectra
     
     nw = X.shape[1]
     nimg = np.max(yim)+1

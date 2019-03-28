@@ -9,6 +9,19 @@
         - Denoising by singular value decomposition
         - Baseline correction
         - Normalization
+        
+        
+    This function return a processed yperspectral Raman image with the dictionary:
+        
+     rawdata: Raw data ndarray of shape of (Width, Height, Wavenumbers)
+        data: processed data ndarray of shape of (Width, Height, Wavenumbers)
+    normdata: normalized processed data*1e3, ndarray of shape of (Width, Height, Wavenumbers)
+  wavenumber: 1-d ndarray corresponding to the 3rd axis of data
+      ignore: boolean ndarray of shape of (Width, Height)
+              If the value is True, the spectrum at that position has to 
+              be ignored since the intensity of that spectrum is extremely strong
+              at some wavenumbers (due to cosmic ray).
+        
 """
 
 
