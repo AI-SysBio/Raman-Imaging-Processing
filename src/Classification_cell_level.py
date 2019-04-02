@@ -185,10 +185,9 @@ def test_classifier(X,yi,yc,yl,plot,classifier,labels):
     
     y_pred = y_score
     n_cell = sum(np.array(n_cell_))
-    acc = np.dot(np.array(n_cell_),np.array(acc_))
-    acc /= n_cell
+    acc = accuracy_score(y_true, y_pred)
     
-    if np.max(y_true) > 1:
+    if np.max(y_true) > 1: #AUC and Fscore not  well defined for multiclass
         AUC = 0
         Fscore = 0
     else:
