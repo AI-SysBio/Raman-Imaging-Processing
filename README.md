@@ -24,3 +24,8 @@ This repository contains the preprocessing and postprocessing tools to analyse h
             (=> requires at least 1FTC image and 1NT image to work)
     
         (see Classification_cell_level.py and Classification_clusters,py for details)
+        
+        
+## References
+
+A. Pelissier, K. Hashimoto, K. Mochizuki, Y. Kumamoto, J. N. Taylor, A. Nakamura, Y. Harada, K. Fujita, T. Komatsuzaki. (2019). Measuremental Informaticson Single cell Raman images to diagnose follicular thyroid carcinoma [https://arxiv.org/abs/1904.05675]
