@@ -20,7 +20,9 @@ from libRaman import Identify_Background, Irradiance_Profile_Correction, cosmicr
           - Bias correction (proper to the device)
           - Correction for irradiance profile
           - Subtraction of BG spectrum
-          - SVD
+          - SVD denoising
+          - Polyfit fluorescence correction
+          - Spectra area normalization
         
     [ref] A. Pelissier, K. Hashimoto, K. Mochizuki, Y. Kumamoto, J. N. Taylor, K. Tabata, 
           JE. Clement, A. Nakamura,  Y. Harada, K. Fujita and T. Komatsuzaki. 
