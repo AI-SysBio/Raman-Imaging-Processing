@@ -17,6 +17,8 @@ A Raman hyperspectral image consists of a three dimensional matrix, the first tw
           - Singular Value Decomposition Denoising
           - Polyfit fluorescence correction
           - Spectra area normalization
+          - Cell region identification
+          - Nucleus and Cytoplasm spectra differentiation
         
         
 ### Running the code
