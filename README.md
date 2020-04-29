@@ -8,7 +8,7 @@ Raman microscopy is a very promising technique to increase reliability in clinic
 
 
 
-A Raman hyperspectral image consists of a three dimensional matrix, the first two axis corresponding to the pixel position and the third axis being the Raman intensity spectrum at that pixel. One image contains roughly 80000 spectra with 1000 wavenumbers each, in the range of 700 - 3000 cm-1. In addition to experimental artifact (laser focus, sample preparation), Raman data typically involve significant noises, fluorescence background due to water and substrate, as well alteration by cosmic rays. This repository contains the tool to process Hyperspectral Raman images and make it as free as possible from differences in experimental conditions:
+A Raman hyperspectral image consists of a three dimensional matrice, the first two axis corresponding to the pixel position and the third axis being the Raman intensity spectrum at that pixel. One image contains roughly 80000 spectra with 1000 wavenumbers each, in the range of 700 - 3000 cm-1. In addition to experimental artifact (laser focus, sample preparation), Raman data typically involve significant noises, fluorescence background due to water and substrate, as well alteration by cosmic rays. This repository contains the tool to process Hyperspectral Raman images and make it as free as possible from differences in experimental conditions:
        
     Process the hyperspectral Raman image with:  
           - Cosmic ray detection
