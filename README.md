@@ -27,6 +27,6 @@ To process Raman images, run `src/_Main - Raman_analysis.py`. Running the progra
 
 ## References
 
-[[1]](https://arxiv.org/abs/1904.05675) Pelissier A., Mochizuki, K., Kumamoto, Y., Taylor, J.N., Tabata, K., Clement, J.E., Nakamura, A., Fujita, K., Harada, Y. and Komatsuzaki, T., 2019. *Intelligent measurement analysis on single cell Raman images for the diagnosis of follicular thyroid carcinoma*. arXiv 
+[[1]](https://arxiv.org/abs/1904.05675) Pelissier A., Mochizuki, K., Kumamoto, Y., Taylor, J.N., Tabata, K., Clement, J.E., Nakamura, A., Fujita, K., Harada, Y. and Komatsuzaki, T., 2019. *Intelligent measurement analysis on single cell Raman images for the diagnosis of follicular thyroid carcinoma*. arXiv.
 
 [[2]](https://pubs.acs.org/doi/10.1021/acs.analchem.3c01406) Taylor JN, Pélissier A, Mochizuki K, Hashimoto K, Kumamoto Y, Harada Y, Fujita K, Bocklitz T, Komatsuzaki T. *Correction for Extrinsic Background in Raman Hyperspectral Images*. Analytical Chemistry. 2023 Aug 10;95(33):12298-305. 
