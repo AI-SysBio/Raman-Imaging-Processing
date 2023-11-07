@@ -22,7 +22,7 @@ A Raman hyperspectral image consists of a three dimensional matrice, the first t
         
         
 ### Running the code
-To process Raman images, run `src/_Main - Raman_analysis.py`. Running the program requires python3, and in addition to standard libraries such as numpy or matplotlib, the program also requires `hdf5storage` (available at https://pypi.org/project/hdf5storage/) to read `.mat` files, and `brokenaxis` (https://github.com/bendichter/brokenaxes) to plot the spectra. Two raw images are provided in `src/Raw_Measurements.py` to show how the code works, but more Raman images are publicly available at https://data.mendeley.com/datasets/dshgffwykw/1
+To process Raman images, run `src/_Main - Raman_analysis.py`. Running the program requires python3, and in addition to standard libraries such as numpy or matplotlib, the program also requires [`hdf5storage`](https://pypi.org/project/hdf5storage/) to read `.mat` files, and [`brokenaxis`](https://github.com/bendichter/brokenaxes) to plot the spectra. Two raw images are provided in `src/Raw_Measurements.py` to show how the code works, but more Raman images are publicly available at https://data.mendeley.com/datasets/dshgffwykw/1
 
 
 ## References
