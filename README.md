@@ -27,6 +27,6 @@ To process Raman images, run `src/_Main - Raman_analysis.py`. Running the progra
 
 ## References
 
-[[1]](https://arxiv.org/abs/1904.05675) Pelissier A, Mochizuki K, Kumamoto Y, Taylor JN, Clement JE, Fujita K, Harada Y and Komatsuzaki T. *Raman Diagnosis of Thyroid Carcinoma in Co-cultured System with Minimizing Extrinsic Background across Different Devices*. arXiv. 2023
+[[1]](https://arxiv.org/abs/1904.05675) Pelissier A, Mochizuki K, Kumamoto Y, Taylor JN, Clement JE, Fujita K, Harada Y and Komatsuzaki T. *Beyond the Nucleus: Cytoplasmic Dominance in Follicular Thyroid Carcinoma Detection Using Single- Cell Raman Imaging Across Multiple Devices*. Analytical Chemistry. 2025.
 
 [[2]](https://pubs.acs.org/doi/10.1021/acs.analchem.3c01406) Taylor JN, Pélissier A, Mochizuki K, Hashimoto K, Kumamoto Y, Harada Y, Fujita K, Bocklitz T, Komatsuzaki T. *Correction for Extrinsic Background in Raman Hyperspectral Images*. Analytical Chemistry. 2023 Aug 10;95(33):12298-305. 
